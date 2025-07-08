@@ -12,6 +12,8 @@ import java.util.Map;
 // but I can promise that it was a big hit with the couple, though it only took them a few hours to decode it. 
 // Feel free to use this code to create your own coded quilt patterns or messages, or to modify it to suit your needs.
 
+// Set the parameters for your strings and the quilt rectangle sizing in the draw() function. Set your colour maps in the CodeRect class.
+
 void setup() {
     size(1000, 1000);    
     background(#FFFFFF);
@@ -32,30 +34,31 @@ void draw() {
   int j = 0 ; 
   int k = 1; 
 
-  
+  // Set Binary and octal strings representing the quilt pattern and colors here
+  // These strings should be the same length. The code will automatically pad the shorter string with spaces to make them the same length, 
+  // but the quilt looks better if they are the same length to start with (or within a few characters of each other).
+  // I have left spaces in these strings to aid in readability, and decoding for the recipient, but you can remove them if you prefer a more compact representation. or difficult challenge
+  // This code will accept octal strings with or without leading zeros, so you can use either format. Use this to your advantage to make the strings the same length.
   String binaryString = "01010100 01101000 01100101 00100000 01100110 01101001 01110010 01110011 01110100 00100000 01101101 01100101 01110011 01110011 01100001 01100111 01100101";
-
   String octalString = "042 115 141 153 145 040 164 150 145 040 163 145 143 157 156 144 040 143 157 144 145 040 155 145 163 163 141 147 145 040 154 157 156 147 145 162 056 042";
 
- // Try to make sure the strings are the same length. If not, pad the shorter one with spaces, either in the text or in the above string. Use a tool like https://www.rapidtables.com/convert/number/ascii-to-binary.html figure out the binary and octal strings.
-  println("Octal");
-  println(octalString.length());
-  println("binary");
-  println(binaryString.length());
+  println("Binary String: " + binaryString.length());
+  println("Octal String: " + octalString.length());
 
+  // Check if the binary and octal strings are the same length, and pad them if necessary
   if (binaryString.length() != octalString.length()) {
-    println("padding strings to make them the same length");
+    println("padding octal string to make them the same length");
     int diff = binaryString.length() - octalString.length();
     for (int i = 0; i < diff; i++) {
       octalString = octalString + " ";
     }
   } else if (octalString.length() > binaryString.length()) {
+    println("padding binary string to make them the same length");
     int diff = octalString.length() - binaryString.length();
     for (int i = 0; i < diff; i++) {
       binaryString = binaryString + " ";
     }
   }
-
 
   Fabric fabric = new Fabric();
 
@@ -79,7 +82,9 @@ void draw() {
     j++; 
   }
 
-  fabric.render("meters"); // Render the fabric requirements in meters. Use "yards" to render in yards.
+
+  // Render the fabric requirements in meters. Use "yards" to render in yards. Set X and Y coordinates to position the text on the canvas.
+  fabric.render("meters", 750, 50); 
 }
 
 
@@ -88,6 +93,8 @@ class CodeRect {
   int xcoord, ycoord, wide, tall, rHeight;
   char flip; 
   char hexColor;
+  color baseColor = color(#fffff0); // base color for the rectangles
+  color spaceColor = color(#000000); // color for the space character in the Hex string. Binary space characters are represented by full height rectangles in the quilt.
 
   // Storing some alternate color maps for testing purposes
   // Uncomment the color map you want to use
@@ -179,7 +186,7 @@ class CodeRect {
       color(#1A7D52),
    };
 
-   color baseColor = color(#fffff0); // base color for the rectangles
+
 
 
 
@@ -217,7 +224,7 @@ class CodeRect {
       case ('7'):
         return colorMap[7];
       case ('8'):
-        return color(#000000);
+        return spaceColor;
       default:
         return color(0,0,0);
     }
@@ -231,7 +238,7 @@ class CodeRect {
       fill(getColor(hexColor));
       rect(xcoord, ycoord+tall, wide, rHeight - tall);
       fill(baseColor);
-      text(hexColor + "," + ((rHeight - tall)), xcoord+5, ycoord+rHeight-5);
+      text(hexColor + "," + ((rHeight - tall)), xcoord+5, ycoord+rHeight-5); // Display the color map code and the height of the rectangle to aid in quilt construction
     } else if (flip == '1') {
       fill(getColor(hexColor));
       rect(xcoord, ycoord, wide, tall); 
@@ -298,7 +305,7 @@ class Fabric {
     return (inches / 45) * 1.1 * 0.0277778; // calculated for 45" width fabric, 10% wasteage, inches to yards;
   }
 
-  void render(String unit) {
+  void render(String unit, int x, int y) {
     String amounts = "Fabric measurements in";
     if (unit.equals("yards")) {
       amounts = amounts + " yards \n"; 
@@ -320,6 +327,6 @@ class Fabric {
     println(amounts);
 
     fill(#000000);
-    text(amounts, 50, 800);
+    text(amounts, x, y);
   }
 }
